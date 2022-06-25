@@ -4,10 +4,10 @@ const ctx = canvas.getContext('2d');
 const opciones = {
     color_linea: 'black',
     grosor_linea: '1',
-    cantidad_puntos: 3,
+    cantidad_puntos: 4,
     dibujar_cangulos: true,
-    dibujar_distancias: false,
-    dibujar_cordenadas: false,
+    dibujar_distancias: true,
+    dibujar_cordenadas: true,
 
 }
 
@@ -49,8 +49,6 @@ function mousePrecionado(evento) {
             puntos.push(element)
         }
         puntos.push(puntos[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
-        
-        console.log(puntos)
 
         dibujarFigura(puntos)
 
@@ -59,7 +57,9 @@ function mousePrecionado(evento) {
         }
         let angulos
         if (opciones.dibujar_cangulos) {
-            angulos = calcularAngulos(puntos)
+            const pendientes = calcularPendiente(puntos)
+            angulos = calcularAngulos(pendientes)
+            dibujarAngulos(puntos, angulos)
         }
         let distancias
         if (opciones.dibujar_distancias) {
@@ -111,7 +111,7 @@ function dibujarPunto(x, y, color = propiedades.color, grosor = '3') {
 
 function dibujarFigura(puntos) {
 
-   
+
     for (let i = 0; i < puntos.length - 1; i++) {
         dibujarLinea(puntos[i].x, puntos[i].y, puntos[i + 1].x, puntos[i + 1].y, opciones.color_linea, opciones.grosor_linea)
 
@@ -126,11 +126,27 @@ function dibujarCordenadas(puntos) {
     }
 
 }
-function calcularAngulos(puntos) {
-    DistanciaEntrePuntos(puntos)
+function calcularAngulos(pendientes) {
+    const angulos = []
+    let pendientes_modificada = []
+    for (let i = 0; i < pendientes.length; i++) {
+        const element = pendientes[i];
+        pendientes_modificada.push(element)
+    }
+    pendientes_modificada.push(pendientes[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
+
+    for (let i = 0; i < pendientes_modificada.length - 1; i++) {
+        
+        const m = ((pendientes_modificada[i + 1] - pendientes_modificada[i])/ (1 + pendientes_modificada[i + 1] * pendientes_modificada[i]))
+        angulos.push(Math.abs(Math.atan(m)*180/Math.PI))
+    }
+    console.log(pendientes)
+    console.log(angulos)
+    return angulos
+
 }
 function DistanciaEntrePuntos(puntos) {
-    
+
     let distancias = []
     //2 2 d (x x ) (y y )     2 1 2 1
     for (let i = 0; i < puntos.length - 1; i++) {
@@ -142,16 +158,29 @@ function DistanciaEntrePuntos(puntos) {
 }
 
 function dibujarDistancias(distancias, puntos) {
-    
+
     console.log(distancias)
 
     ctx.lineWidth = '.6'
     for (let i = 0; i < puntos.length - 1; i++) {
         ctx.strokeText(`${String.fromCharCode(97 + i)} ${parseInt(distancias[i])}`, (puntos[i].x + puntos[i + 1].x) / 2, (puntos[i].y + puntos[i + 1].y) / 2)
-        console.log('hola')
     }
 }
 
-function calcularPendiente() {
+function calcularPendiente(puntos) {
+    const pendientes = []
+    for (let i = 0; i < puntos.length - 1; i++) {
+        pendientes.push((puntos[i + 1].y - puntos[i].y) / (puntos[i + 1].x - puntos[i].x))
+    }
 
+    return pendientes
+}
+
+function dibujarAngulos(puntos, angulos){
+
+    ctx.lineWidth = '.6'
+    for (let i = 0; i < puntos.length - 1; i++) {
+        ctx.strokeText(`${String.fromCharCode(579 + i)} ${(angulos[i]).toFixed(1)}॰`, puntos[i].x - 10 , puntos[i].y + 10 )
+        
+    }
 }
