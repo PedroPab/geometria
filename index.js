@@ -1,13 +1,17 @@
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d');
-
-const opciones = {
+const boton_borrar = document.getElementById('boton_borrar')
+boton_borrar.addEventListener('click', ()=> {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    dibujarCuadricula()
+})
+let opciones = {
     color_linea: 'black',
     grosor_linea: '1',
-    cantidad_puntos: 4,
-    dibujar_cangulos: true,
-    dibujar_distancias: true,
-    dibujar_cordenadas: true,
+    cantidad_puntos: false,
+    dibujar_cangulos: false,
+    dibujar_distancias: false,
+    dibujar_cordenadas: false,
 
 }
 
@@ -36,6 +40,21 @@ if (canvas.getContext) {
 }
 
 function mousePrecionado(evento) {
+    
+    let checkbox_dibujar_cangulos = document.getElementById('checkbox_dibujar_cangulos')
+    let checkbox_dibujar_cordenadas = document.getElementById('checkbox_dibujar_cordenadas')
+    let checkbox_dibujar_distancia = document.getElementById('checkbox_dibujar_distancia')
+    let input_cantidad_puntos = document.getElementById('input_cantidad_puntos').value
+
+    opciones = {
+        ...opciones,
+        dibujar_cangulos: checkbox_dibujar_cangulos.checked,
+        dibujar_distancias: checkbox_dibujar_distancia.checked,
+        dibujar_cordenadas: checkbox_dibujar_cordenadas.checked,
+        cantidad_puntos: input_cantidad_puntos,
+    }
+
+
 
     puntos_orinales.push({ x: evento.offsetX, y: evento.offsetY })
     dibujarPunto(evento.offsetX, evento.offsetY)
@@ -67,7 +86,11 @@ function mousePrecionado(evento) {
             dibujarDistancias(distancias, puntos)
         }
 
-        coleccion.push({ cordenadas: puntos_orinales, angulos: angulos, distancias: distancias })
+        coleccion.push({
+            cordenadas: puntos_orinales,
+            angulos: angulos,
+            distancias: distancias
+        })
         puntos_orinales = []
     }
 
@@ -120,7 +143,7 @@ function dibujarFigura(puntos) {
 }
 function dibujarCordenadas(puntos) {
     ctx.lineWidth = '.6'
-    for (let i = 0; i < puntos.length; i++) {
+    for (let i = 0; i < puntos.length - 1; i++) {
         ctx.strokeText(`${String.fromCharCode(65 + i)}(${puntos[i].x}, ${puntos[i].y})`, puntos[i].x - 10, puntos[i].y - 10)
 
     }
@@ -136,12 +159,11 @@ function calcularAngulos(pendientes) {
     pendientes_modificada.push(pendientes[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
 
     for (let i = 0; i < pendientes_modificada.length - 1; i++) {
-        
-        const m = ((pendientes_modificada[i + 1] - pendientes_modificada[i])/ (1 + pendientes_modificada[i + 1] * pendientes_modificada[i]))
-        angulos.push(Math.abs(Math.atan(m)*180/Math.PI))
+
+        const m = ((pendientes_modificada[i + 1] - pendientes_modificada[i]) / (1 + pendientes_modificada[i + 1] * pendientes_modificada[i]))
+        angulos.push(Math.abs(Math.atan(m) * 180 / Math.PI))
     }
-    console.log(pendientes)
-    console.log(angulos)
+    
     return angulos
 
 }
@@ -154,12 +176,12 @@ function DistanciaEntrePuntos(puntos) {
 
     }
     return distancias
-    console.log(distancias, puntos)
+    
 }
 
 function dibujarDistancias(distancias, puntos) {
 
-    console.log(distancias)
+    
 
     ctx.lineWidth = '.6'
     for (let i = 0; i < puntos.length - 1; i++) {
@@ -176,11 +198,11 @@ function calcularPendiente(puntos) {
     return pendientes
 }
 
-function dibujarAngulos(puntos, angulos){
+function dibujarAngulos(puntos, angulos) {
 
     ctx.lineWidth = '.6'
     for (let i = 0; i < puntos.length - 1; i++) {
-        ctx.strokeText(`${String.fromCharCode(579 + i)} ${(angulos[i]).toFixed(1)}॰`, puntos[i].x - 10 , puntos[i].y + 10 )
-        
+        ctx.strokeText(`${String.fromCharCode(579 + i)} ${(angulos[i]).toFixed(1)}॰`, puntos[i].x - 10, puntos[i].y + 10)
+
     }
 }
