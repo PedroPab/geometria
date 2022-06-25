@@ -23,7 +23,7 @@ const propiedades = {
     grosor_cuadricula: '0.3'
 }
 let coleccion = []//el array con todos los objetos del objeto que calculamos
-let puntos = [] //el array con todos lo puntos que tnemos como  obejitivos a calcular
+let puntos_orinales = [] //el array con todos lo puntos que tnemos como  obejitivos a calcular
 
 if (canvas.getContext) {
     dibujarCuadricula()
@@ -37,11 +37,21 @@ if (canvas.getContext) {
 
 function mousePrecionado(evento) {
 
-    puntos.push({ x: evento.offsetX, y: evento.offsetY })
+    puntos_orinales.push({ x: evento.offsetX, y: evento.offsetY })
     dibujarPunto(evento.offsetX, evento.offsetY)
 
 
-    if (puntos.length >= opciones.cantidad_puntos) {
+    if (puntos_orinales.length >= opciones.cantidad_puntos) {
+
+        let puntos = []
+        for (let i = 0; i < puntos_orinales.length; i++) {
+            const element = puntos_orinales[i];
+            puntos.push(element)
+        }
+        puntos.push(puntos[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
+        
+        console.log(puntos)
+
         dibujarFigura(puntos)
 
         if (opciones.dibujar_cordenadas) {
@@ -51,14 +61,14 @@ function mousePrecionado(evento) {
         if (opciones.dibujar_cangulos) {
             angulos = calcularAngulos(puntos)
         }
-        let distancias 
-        if(opciones.dibujar_distancias){
+        let distancias
+        if (opciones.dibujar_distancias) {
             distancias = DistanciaEntrePuntos(puntos)
             dibujarDistancias(distancias, puntos)
         }
 
-        coleccion.push({ cordenadas: puntos, angulos: angulos , distancias: distancias})
-        puntos = []
+        coleccion.push({ cordenadas: puntos_orinales, angulos: angulos, distancias: distancias })
+        puntos_orinales = []
     }
 
 
@@ -101,18 +111,9 @@ function dibujarPunto(x, y, color = propiedades.color, grosor = '3') {
 
 function dibujarFigura(puntos) {
 
-    //tengo que crear un nueva referencia para la variable puntos_adaptados
-    let puntos_adaptados = []
-    for (let i = 0; i < puntos.length; i++) {
-        const element = puntos[i];
-        puntos_adaptados.push(element)
-    }
-
-    puntos_adaptados.push(puntos_adaptados[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
-
-
-    for (let i = 0; i < puntos_adaptados.length - 1; i++) {
-        dibujarLinea(puntos_adaptados[i].x, puntos_adaptados[i].y, puntos_adaptados[i + 1].x, puntos_adaptados[i + 1].y, opciones.color_linea, opciones.grosor_linea)
+   
+    for (let i = 0; i < puntos.length - 1; i++) {
+        dibujarLinea(puntos[i].x, puntos[i].y, puntos[i + 1].x, puntos[i + 1].y, opciones.color_linea, opciones.grosor_linea)
 
     }
 
@@ -129,41 +130,28 @@ function calcularAngulos(puntos) {
     DistanciaEntrePuntos(puntos)
 }
 function DistanciaEntrePuntos(puntos) {
-    let puntos_adaptados = []
-    for (let i = 0; i < puntos.length; i++) {
-        const element = puntos[i];
-        puntos_adaptados.push(element)
-    }
-    puntos_adaptados.push(puntos_adaptados[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
-
+    
     let distancias = []
     //2 2 d (x x ) (y y )     2 1 2 1
-    for (let i = 0; i < puntos_adaptados.length - 1; i++) {
-        distancias.push(Math.sqrt(Math.pow(puntos_adaptados[i + 1].x - puntos_adaptados[i].x , 2) + Math.pow(puntos_adaptados[i + 1].y - puntos_adaptados[i].y , 2)))
+    for (let i = 0; i < puntos.length - 1; i++) {
+        distancias.push(Math.sqrt(Math.pow(puntos[i + 1].x - puntos[i].x, 2) + Math.pow(puntos[i + 1].y - puntos[i].y, 2)))
 
     }
     return distancias
-    console.log(distancias, puntos_adaptados)
+    console.log(distancias, puntos)
 }
 
-function dibujarDistancias(distancias, puntos){
-    let puntos_adaptados = []
-    for (let i = 0; i < puntos.length; i++) {
-        const element = puntos[i];
-        puntos_adaptados.push(element)
-    }
-
-    puntos_adaptados.push(puntos_adaptados[0])//añadimos el primer punto como el ultio pra poder cerar  la figura
-
+function dibujarDistancias(distancias, puntos) {
+    
     console.log(distancias)
 
     ctx.lineWidth = '.6'
-    for (let i = 0; i < puntos_adaptados.length - 1; i++) {
-        ctx.strokeText(`${String.fromCharCode(97 + i)} ${parseInt(distancias[i])}`, (puntos_adaptados[i].x + puntos_adaptados[i + 1].x )/2, (puntos_adaptados[i].y + puntos_adaptados[i + 1].y)/2)
+    for (let i = 0; i < puntos.length - 1; i++) {
+        ctx.strokeText(`${String.fromCharCode(97 + i)} ${parseInt(distancias[i])}`, (puntos[i].x + puntos[i + 1].x) / 2, (puntos[i].y + puntos[i + 1].y) / 2)
         console.log('hola')
     }
 }
 
-function calcularPendiente(){
-    
+function calcularPendiente() {
+
 }
